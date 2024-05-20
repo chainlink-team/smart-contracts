@@ -4,43 +4,42 @@ require("dotenv").config();
 const { PRIVATE_KEY } = process.env;
 
 module.exports = {
-  defaultNetwork: "hardhat",
   networks: {
     hardhat: {},
     polygonZkEVM: {
-      url: "", // Replace with actual RPC URL
+      url: "https://polygonzkevm-testnet.g.alchemy.com/v2/demo", // Replace with actual RPC URL
       accounts: [PRIVATE_KEY],
-      chainId: 0, // Replace with the actual chain ID
+      chainId: 1422, // Replace with the actual chain ID
     },
     polygonCardanoTestnet: {
-      url: "", // Replace with actual RPC URL
+      url: "https://polygon-zkevm-cardona.blockpi.network/v1/rpc/public", // Replace with actual RPC URL
       accounts: [PRIVATE_KEY],
-      chainId: 0, // Replace with the actual chain ID
+      chainId: 2442, // Replace with the actual chain ID
     },
     polygonPOS_Amoy: {
-      url: "", // Replace with actual RPC URL
+      url: "https://rpc-amoy.polygon.technology/", // Replace with actual RPC URL
       accounts: [PRIVATE_KEY],
-      chainId: 0, // Replace with the actual chain ID
+      chainId: 80002, // Replace with the actual chain ID
     },
     avalancheFuji: {
-      url: "",
+      url: "wss://avalanche-fuji-c-chain-rpc.publicnode.com",
       accounts: [PRIVATE_KEY],
-      chainId: 0,
+      chainId: 43113,
     },
     scrollSepolia: {
-      url: "", // Replace with actual RPC URL
+      url: "https://scroll-sepolia.blockpi.network/v1/rpc/public", // Replace with actual RPC URL
       accounts: [PRIVATE_KEY],
-      chainId: 0, // Replace with the actual chain ID
+      chainId: 534351, // Replace with the actual chain ID
     },
-    metis: {
-      url: "", // Replace with actual RPC URL
-      accounts: [PRIVATE_KEY],
-      chainId: 0, // Replace with the actual chain ID
-    },
+    // metis: {
+    //   url: "", // Replace with actual RPC URL
+    //   accounts: [PRIVATE_KEY],
+    //   chainId: 0, // Replace with the actual chain ID
+    // },
     zkSyncSepolia: {
-      url: "", // Replace with actual RPC URL
+      url: "wss://zksync-sepolia.drpc.org	", // Replace with actual RPC URL
       accounts: [PRIVATE_KEY],
-      chainId: 0, // Replace with the actual chain ID
+      chainId: 300, // Replace with the actual chain ID
     },
   },
   etherscan: {

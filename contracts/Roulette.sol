@@ -1,26 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "@chainlink/contracts/src/v0.8/vrf/interfaces/VRFCoordinatorV2Interface.sol";
-import "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
-import "@chainlink/contracts/src/v0.8/shared/access/ConfirmedOwner.sol";
+import "@chainlink/contracts/src/v0.8/vrf/dev/interfaces/IVRFCoordinatorV2Plus.sol";
+import "@chainlink/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
+import "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol";
 
 /**
  * @title Roulette Contract
  * @notice A smart contract that uses Chainlink VRF V2 to obtain random values for playing roulette.
  */
 
-contract Roulette is
-    VRFConsumerBaseV2,
-    ConfirmedOwner,
-    AutomationCompatibleInterface
-{
-    VRFCoordinatorV2Interface immutable COORDINATOR;
+contract Roulette is VRFConsumerBaseV2Plus {
+    IVRFCoordinatorV2Plus immutable COORDINATOR;
     IERC20 public linkToken;
 
-    uint64 immutable s_subscriptionId;
+    uint256 immutable s_subscriptionId;
     bytes32 immutable s_keyHash;
     uint32 public callbackGasLimit = 2500000;
     uint16 public requestConfirmations = 3;
@@ -105,12 +100,12 @@ contract Roulette is
     event WinningsWithdrawn(address indexed player, uint256 amount);
 
     constructor(
-        uint64 subscriptionId,
+        uint256 subscriptionId,
         address vrfCoordinator,
         bytes32 keyHash,
         address _linkToken
-    ) VRFConsumerBaseV2(vrfCoordinator) ConfirmedOwner(msg.sender) {
-        COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinator);
+    ) VRFConsumerBaseV2Plus(vrfCoordinator) {
+        COORDINATOR = IVRFCoordinatorV2Plus(vrfCoordinator);
         s_keyHash = keyHash;
         s_subscriptionId = subscriptionId;
         linkToken = IERC20(_linkToken);
@@ -154,13 +149,26 @@ contract Roulette is
     function rollDice(address newroller) public returns (uint256 requestId) {
         require(playerBets[newroller].length > 0, "No bet placed");
 
-        requestId = COORDINATOR.requestRandomWords(
-            s_keyHash,
-            s_subscriptionId,
-            requestConfirmations,
-            callbackGasLimit,
-            numWords
+        requestId = s_vrfCoordinator.requestRandomWords(
+            VRFV2PlusClient.RandomWordsRequest({
+                keyHash: s_keyHash,
+                subId: s_subscriptionId,
+                requestConfirmations: requestConfirmations,
+                callbackGasLimit: callbackGasLimit,
+                numWords: numWords,
+                extraArgs: VRFV2PlusClient._argsToBytes(
+                    VRFV2PlusClient.ExtraArgsV1({nativePayment: true})
+                )
+            })
         );
+
+        // requestId = COORDINATOR.requestRandomWords(
+        //     s_keyHash,
+        //     s_subscriptionId,
+        //     requestConfirmations,
+        //     callbackGasLimit,
+        //     numWords
+        // );
 
         s_rollers[requestId] = newroller;
 
@@ -433,21 +441,21 @@ contract Roulette is
         return (0, 0);
     }
 
-    // This function is called by the Chainlink Keeper network to check if any upkeep is needed
-    function checkUpkeep(
-        bytes calldata
-    ) external view override returns (bool upkeepNeeded, bytes memory) {
-        upkeepNeeded = invokeUpkeep;
-        return (upkeepNeeded, "0x0");
-    }
+    // // This function is called by the Chainlink Keeper network to check if any upkeep is needed
+    // function checkUpkeep(
+    //     bytes calldata
+    // ) external view override returns (bool upkeepNeeded, bytes memory) {
+    //     upkeepNeeded = invokeUpkeep;
+    //     return (upkeepNeeded, "0x0");
+    // }
 
-    // This function is called by the Chainlink Keeper network to perform any necessary upkeep
-    function performUpkeep(bytes calldata) external override {
-        (bool upkeepNeeded, ) = this.checkUpkeep("");
-        if (upkeepNeeded) {
-            rollDice(newRoller);
-        }
-    }
+    // // This function is called by the Chainlink Keeper network to perform any necessary upkeep
+    // function performUpkeep(bytes calldata) external override {
+    //     (bool upkeepNeeded, ) = this.checkUpkeep("");
+    //     if (upkeepNeeded) {
+    //         rollDice(newRoller);
+    //     }
+    // }
 
     // Function to get the current winnings of a user
     function getCurrentWinnings(address user) public view returns (uint256) {
