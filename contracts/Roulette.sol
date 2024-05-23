@@ -6,6 +6,7 @@ import "@chainlink/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
 import "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+
 /**
  * @title Roulette Contract
  * @notice A smart contract that uses Chainlink VRF V2 to obtain random values for playing roulette.
