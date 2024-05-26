@@ -1,11 +1,22 @@
-require("@nomicfoundation/hardhat-toolbox");
+require("@nomicfoundation/hardhat-toolbox")
+require("hardhat-contract-sizer")
+require("@openzeppelin/hardhat-upgrades")
+require("./tasks")
+require("@chainlink/env-enc").config()
+const { networks } = require("./networks")
+
+// Enable gas reporting (optional)
 require("dotenv").config();
+
+const REPORT_GAS = process.env.REPORT_GAS?.toLowerCase() === "true" ? true : false
 
 const { PRIVATE_KEY } = process.env;
 
 module.exports = {
   networks: {
-    hardhat: {},
+    hardhat: {
+      allowUnlimitedContractSize: true,
+    },
     polygonZkEVM: {
       url: "https://polygonzkevm-testnet.g.alchemy.com/v2/demo", // Replace with actual RPC URL
       accounts: [PRIVATE_KEY],

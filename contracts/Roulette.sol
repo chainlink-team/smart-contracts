@@ -5,6 +5,7 @@ import "@chainlink/contracts/src/v0.8/vrf/dev/interfaces/IVRFCoordinatorV2Plus.s
 import "@chainlink/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
 import "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {NativeTokenSender} from "./ccip/NativeTokenSender.sol";
 
 
 /**
@@ -12,9 +13,24 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * @notice A smart contract that uses Chainlink VRF V2 to obtain random values for playing roulette.
  */
 
-contract Roulette is VRFConsumerBaseV2Plus {
+// Configuration parameters for initializing the contract
+struct Config {
+  address oracle; // The address of the Chainlink Function oracle
+  address ccipRouter; // The address of the Chainlink CCIP router
+  address link; // The address of the LINK token
+  address weth9Token; // The address of the WETH9 token
+  address exchangeToken; // The address of the exchange token used to transfer native tokens
+  address uniswapV3Router; // The address of the Uniswap V3 router
+  uint64 subscriptionId; // The ID of the Chainlink Functions subscription
+  uint64 destinationChainSelector; // The chain selector for the winnings transfer destination chain
+  bytes32 donId; // The ID of the Chainlink oracle network
+  bytes secrets; // The secrets for the Chainlink Functions request
+  string source; // The source code for the Chainlink Functions request
+}
+
+contract Roulette is NativeTokenSender, VRFConsumerBaseV2Plus {
     IVRFCoordinatorV2Plus immutable COORDINATOR;
-    IERC20 public linkToken;
+    IERC20 public tokenLink;
 
     uint256 immutable s_subscriptionId;
     bytes32 immutable s_keyHash;
@@ -101,15 +117,24 @@ contract Roulette is VRFConsumerBaseV2Plus {
     event WinningsWithdrawn(address indexed player, uint256 amount);
 
     constructor(
+        Config memory config,
         uint256 subscriptionId,
         address vrfCoordinator,
-        bytes32 keyHash,
-        address _linkToken
-    ) VRFConsumerBaseV2Plus(vrfCoordinator) {
+        bytes32 keyHash
+    ) 
+    NativeTokenSender(
+      config.ccipRouter,
+      config.link,
+      config.weth9Token,
+      config.exchangeToken,
+      config.uniswapV3Router,
+      config.destinationChainSelector
+    )
+    VRFConsumerBaseV2Plus(vrfCoordinator) {
         COORDINATOR = IVRFCoordinatorV2Plus(vrfCoordinator);
         s_keyHash = keyHash;
         s_subscriptionId = subscriptionId;
-        linkToken = IERC20(_linkToken);
+        tokenLink = IERC20(config.link);
     }
 
     function placeBets(uint256[157] calldata betAmounts) external {
@@ -122,17 +147,17 @@ contract Roulette is VRFConsumerBaseV2Plus {
 
         // Ensure the player has approved the contract to spend their LINK tokens & has accurate amount
         require(
-            linkToken.allowance(msg.sender, address(this)) >= totalBetAmount,
+            tokenLink.allowance(msg.sender, address(this)) >= totalBetAmount,
             "Contract is not allowed to spend enough LINK tokens."
         );
         require(
-            linkToken.allowance(msg.sender, address(this)) >= totalBetAmount,
+            tokenLink.allowance(msg.sender, address(this)) >= totalBetAmount,
             "Insufficient LINK balance"
         );
 
         // Transfer LINK Tokens from the player to the contract
         require(
-            linkToken.transferFrom(msg.sender, address(this), totalBetAmount),
+            tokenLink.transferFrom(msg.sender, address(this), totalBetAmount),
             "Failed to transfer LINK tokens"
         );
 
@@ -468,11 +493,13 @@ contract Roulette is VRFConsumerBaseV2Plus {
         require(amount > 0, "No winnings to withdraw");
         winnings[msg.sender] = 0;
 
+        // Send the request to the oracle contract to withdraw LINK
+        _sendTransferRequest(msg.sender, amount);
         // Use LINK token's transfer function to send winnings
-        require(
-            linkToken.transfer(msg.sender, amount),
-            "Failed to transfer winnings"
-        );
+        // require(
+        //     tokenLink.transfer(msg.sender, amount),
+        //     "Failed to transfer winnings"
+        // );
 
         emit WinningsWithdrawn(msg.sender, amount);
     }
