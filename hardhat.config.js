@@ -12,38 +12,46 @@ module.exports = {
       chainId: 1422, // Replace with the actual chain ID
     },
     polygonCardanoTestnet: {
-      url: "https://polygon-zkevm-cardona.blockpi.network/v1/rpc/public", // Replace with actual RPC URL
+      url: "https://rpc.cardona.zkevm-rpc.com", // Replace with actual RPC URL
       accounts: [PRIVATE_KEY],
       chainId: 2442, // Replace with the actual chain ID
     },
-    polygonPOS_Amoy: {
+    polygonAmoy: {
       url: "https://rpc-amoy.polygon.technology/", // Replace with actual RPC URL
       accounts: [PRIVATE_KEY],
       chainId: 80002, // Replace with the actual chain ID
     },
     avalancheFuji: {
-      url: "wss://avalanche-fuji-c-chain-rpc.publicnode.com",
-      accounts: [PRIVATE_KEY],
+      url: "https://api.avax-test.network/ext/bc/C/rpc",
       chainId: 43113,
-    },
-    scrollSepolia: {
-      url: "https://scroll-sepolia.blockpi.network/v1/rpc/public", // Replace with actual RPC URL
       accounts: [PRIVATE_KEY],
-      chainId: 534351, // Replace with the actual chain ID
     },
-    // metis: {
-    //   url: "", // Replace with actual RPC URL
+    metis: {
+      url: "https://andromeda.metis.io", // Replace with actual RPC URL
+      accounts: [PRIVATE_KEY],
+      chainId: 1088, // Replace with the actual chain ID
+    },
+    // zkSyncSepolia: {
+    //   url: "wss://zksync-sepolia.drpc.org	", // Replace with actual RPC URL
     //   accounts: [PRIVATE_KEY],
-    //   chainId: 0, // Replace with the actual chain ID
+    //   chainId: 300, // Replace with the actual chain ID
     // },
-    zkSyncSepolia: {
-      url: "wss://zksync-sepolia.drpc.org	", // Replace with actual RPC URL
-      accounts: [PRIVATE_KEY],
-      chainId: 300, // Replace with the actual chain ID
-    },
   },
   etherscan: {
-    apiKey: {},
+    apiKey: {
+      polygonAmoy: "713e704f-5a62-4a0f-b30f-9fc9d1001aa2",
+    },
+    customChains: [
+      {
+        network: "polygonAmoy",
+        chainId: 80002,
+        urls: {
+          apiURL:
+            "https://www.oklink.com/api/explorer/v1/contract/verify/async/api/polygonAmoy",
+          browserURL: "https://www.oklink.com/polygonAmoy",
+        },
+      },
+    ],
   },
   solidity: {
     version: "0.8.20",
