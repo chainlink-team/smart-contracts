@@ -6,7 +6,6 @@ import "@chainlink/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
 import "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-
 /**
  * @title Roulette Contract
  * @notice A smart contract that uses Chainlink VRF V2 to obtain random values for playing roulette.
@@ -184,7 +183,7 @@ contract Roulette is VRFConsumerBaseV2Plus {
     // Set result to be between 1 and 36 for roulette
     function fulfillRandomWords(
         uint256 requestId,
-        uint256[] memory randomWords
+        uint256[] calldata randomWords
     ) internal override {
         uint256 randomResult = (randomWords[0] % 36) + 1;
         address roller = s_rollers[requestId];

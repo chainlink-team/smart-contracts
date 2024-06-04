@@ -21,25 +21,26 @@ module.exports = {
       accounts: [PRIVATE_KEY],
       chainId: 80002, // Replace with the actual chain ID
     },
-    avalancheFuji: {
+    snowtrace: {
       url: "https://api.avax-test.network/ext/bc/C/rpc",
       chainId: 43113,
       accounts: [PRIVATE_KEY],
     },
     metis: {
-      url: "https://andromeda.metis.io", // Replace with actual RPC URL
+      url: "https://sepolia.metisdevops.link", // Replace with actual RPC URL
       accounts: [PRIVATE_KEY],
-      chainId: 1088, // Replace with the actual chain ID
+      chainId: 59902, // Replace with the actual chain ID
     },
-    // zkSyncSepolia: {
-    //   url: "wss://zksync-sepolia.drpc.org	", // Replace with actual RPC URL
-    //   accounts: [PRIVATE_KEY],
-    //   chainId: 300, // Replace with the actual chain ID
-    // },
+    scroll: {
+      url: "https://sepolia-rpc.scroll.io",
+      accounts: [PRIVATE_KEY],
+      chainId: 534351,
+    },
   },
   etherscan: {
     apiKey: {
       polygonAmoy: "713e704f-5a62-4a0f-b30f-9fc9d1001aa2",
+      snowtrace: "snowtrace",
     },
     customChains: [
       {
@@ -49,6 +50,15 @@ module.exports = {
           apiURL:
             "https://www.oklink.com/api/explorer/v1/contract/verify/async/api/polygonAmoy",
           browserURL: "https://www.oklink.com/polygonAmoy",
+        },
+      },
+      {
+        network: "snowtrace",
+        chainId: 43113,
+        urls: {
+          apiURL:
+            "https://api.routescan.io/v2/network/testnet/evm/43113/etherscan",
+          browserURL: "https://avalanche.testnet.localhost:8080",
         },
       },
     ],
