@@ -38,3 +38,7 @@ All Contracts Tested, Deployed and Verfied:
 - **Metis sepolia deployed:** https://sepolia-explorer.metisdevops.link/address/0x0175DD80dc6EEE9b5443E31036D184Ea895D74a9
 
 - **Scroll sepolia Contract:** https://sepolia.scrollscan.com/address/0x7D28aD92df4cDF6CA3ffD1E1d5c412800d7d6C76
+
+- **Contracts Demo Video**: 
+
+https://www.loom.com/share/617e2aab398f413ca8ceaf232b27bb73?sid=5e355e8c-3f0d-4fae-aef1-7acb688a6b91
